@@ -15,24 +15,25 @@ const commandFiles = fs
   .readdirSync(commandsPath)
   .filter((file) => file.endsWith('.js'));
 
-async () => {
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+
+const LoadCommands = async (callback) => {
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const command = await import(`file:///${filePath}`);
     commands.push(command.command.data.toJSON());
   }
+  callback();
 };
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
-
-(async () => {
+const PushCommands = async () => {
   try {
     console.log(
       `Started refreshing ${commands.length} application (/) commands.`
     );
 
     const data = await rest.put(
-      Routes.applicationGuildCommands(
+      Routes.applicationCommands(
         process.env.CLIENT_ID,
         process.env.DEV_GUILD_ID
       ),
@@ -45,4 +46,6 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
   } catch (error) {
     console.error(error);
   }
-})();
+};
+
+LoadCommands(PushCommands);
