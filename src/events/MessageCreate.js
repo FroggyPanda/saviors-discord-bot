@@ -19,7 +19,6 @@ export const event = {
     }
 
     if (cache.get(interactionAuthorID) == undefined) {
-      cache.set(interactionAuthorID, interactionCreatedTimestamp);
       cache.set(data[0].uuid, data[0].createdTimestamp);
       console.log(cache.data);
       console.log(interaction.createdTimestamp);
