@@ -14,14 +14,30 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 });
 
-export const cache = new NodeCache({ stdTTL: 5 * 60 });
-cache.on('del', async (key, value) => {
+const UpdateDatabase = async (key, objToUpdate) => {
   const { error } = await supabase
     .from('test')
-    .update({ createdTimestamp: value })
+    .update(objToUpdate)
     .eq('uuid', key);
 
   if (error) console.log(JSON.stringify(error));
+};
+
+export const cache = new NodeCache({ stdTTL: 10 });
+cache.on('del', async (key, value) => {
+  console.log('del value: ', value);
+
+  if (value.createdTimestamp !== undefined) {
+    UpdateDatabase(key, { createdTimestamp: value.createdTimestamp });
+  }
+
+  if (value.xp !== undefined) {
+    UpdateDatabase(key, { xp: value.xp });
+  }
+
+  if (value.level !== undefined) {
+    UpdateDatabase(key, { level: value.level });
+  }
 });
 
 export const supabase = createClient(
