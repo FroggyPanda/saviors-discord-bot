@@ -17,12 +17,9 @@ const Level = async (interaction) => {
 
   // create cache if not in cache already
   if (cache.get(interactionAuthorID) == undefined) {
-    // TODO@FroggyPanda
-    // fix what ever this shit is ;-; and have @ActuallyTomas help?
     console.log('created cache');
 
     let db = await getData(interactionAuthorID);
-    console.log(db);
 
     if (db.data.length === 0) {
       console.log('insert data');
@@ -33,10 +30,9 @@ const Level = async (interaction) => {
       if (error) console.error(error);
     }
 
+    // TODO@FroggyPanda : figure out if there is a way to not have to call the API twice
     db = await getData(interactionAuthorID);
-    console.log(db.data[0]);
     cache.set(db.data[0].uuid, db.data[0]);
-    console.log('  ', cache.get(interactionAuthorID));
   }
 
   // check if msg is older than designated time than one in cache
@@ -70,13 +66,12 @@ const Level = async (interaction) => {
       return data[0].level;
     };
 
-    const newCache = {
+    cache.set(interactionAuthorID, {
+      ...cache.get(interactionAuthorID),
       createdTimestamp: interactionCreatedTimestamp,
       xp: cache.get(interactionAuthorID).xp + 1 || (await GetXP()) + 1,
       level: cache.get(interactionAuthorID).level || (await GetLevel()),
-    };
-
-    cache.set(interactionAuthorID, newCache);
+    });
     console.log('  ', cache.get(interactionAuthorID));
   }
 };
