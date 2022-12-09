@@ -66,13 +66,22 @@ const Level = async (interaction) => {
       return data[0].level;
     };
 
+    const SetXpAndLevel = async (id) => {
+      let xp = cache.get(id).xp + 1 || (await GetXP()) + 1;
+      let level = cache.get(id).level || (await GetLevel());
+
+      if (5 * (level ^ 2) + 50 * level + 100 - xp <= 0) {
+        level++;
+        xp = 0;
+      }
+      return { xp, level };
+    };
     cache.set(interactionAuthorID, {
       ...cache.get(interactionAuthorID),
       createdTimestamp: interactionCreatedTimestamp,
-      xp: cache.get(interactionAuthorID).xp + 1 || (await GetXP()) + 1,
-      level: cache.get(interactionAuthorID).level || (await GetLevel()),
+      ...(await SetXpAndLevel(interactionAuthorID)),
     });
-    console.log('  ', cache.get(interactionAuthorID));
+    console.log(cache.get(interactionAuthorID));
   }
 };
 
