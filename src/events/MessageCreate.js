@@ -42,7 +42,7 @@ const Level = async (interaction) => {
     };
     cache.set('test', interactionAuthorID, {
       ...cache.get('test', interactionAuthorID),
-      createdTimestamp: interactionCreatedTimestamp.toString(),
+      createdTimestamp: interactionCreatedTimestamp,
       ...(await SetXpAndLevel(interactionAuthorID)),
     });
   }
