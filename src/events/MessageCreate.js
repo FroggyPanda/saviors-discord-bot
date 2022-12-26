@@ -1,5 +1,5 @@
 import { Events } from 'discord.js';
-import ms from 'ms';
+import general from '../config/general.js';
 import { supabase, cache } from '../index.js';
 
 const Level = async (interaction) => {
@@ -25,7 +25,8 @@ const Level = async (interaction) => {
   // check if msg is older than designated time than one in cache
   if (
     interactionCreatedTimestamp >=
-    cache.get('test', interactionAuthorID).createdTimestamp + ms('5s')
+    cache.get('test', interactionAuthorID).createdTimestamp +
+      general.messageCreate.timeSpan
   ) {
     console.log('msg is older than 1min than the last msg');
 

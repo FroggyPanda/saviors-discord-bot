@@ -6,6 +6,7 @@ import LoadCommands from './modules/LoadCommands.js';
 import LoadEvents from './modules/LoadEvents.js';
 import Cache from './lib/cache.js';
 import { createClient } from '@supabase/supabase-js';
+import general from './config/general.js';
 config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,8 +49,7 @@ const submitData = async () => {
   }
 };
 
-// 10 * 1000ms => 10sec
-export const cache = new Cache(10 * 1000);
+export const cache = new Cache(general.cache.timeOfLife);
 
 getData();
 
