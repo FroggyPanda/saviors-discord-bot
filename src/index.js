@@ -4,7 +4,7 @@ import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
 import LoadCommands from './modules/LoadCommands.js';
 import LoadEvents from './modules/LoadEvents.js';
-import NodeCache from 'node-cache';
+import Cache from './lib/cache.js';
 import { createClient } from '@supabase/supabase-js';
 config();
 
@@ -14,36 +14,49 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 });
 
-const UpdateDatabase = async (key, objToUpdate) => {
-  const { error } = await supabase
-    .from('test')
-    .update(objToUpdate)
-    .eq('uuid', key);
-
-  if (error) console.log(JSON.stringify(error));
-};
-
-export const cache = new NodeCache({ stdTTL: 10 });
-cache.on('del', async (key, value) => {
-  console.log('del value: ', value);
-
-  if (value.createdTimestamp !== undefined) {
-    UpdateDatabase(key, { createdTimestamp: value.createdTimestamp });
-  }
-
-  if (value.xp !== undefined) {
-    UpdateDatabase(key, { xp: value.xp });
-  }
-
-  if (value.level !== undefined) {
-    UpdateDatabase(key, { level: value.level });
-  }
-});
-
 export const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
+
+const getData = () => {
+  supabase
+    .from('test')
+    .select()
+    .then((result) => {
+      if (result.error) {
+        console.error(result.error);
+        return;
+      }
+
+      Object.keys(result.data).map((key) => {
+        cache.set('test', result.data[key].uuid, result.data[key]);
+      });
+    });
+};
+
+const submitData = async () => {
+  for (const table in cache.data) {
+    const payload = [];
+    for (const [k, v] of cache.data[table]) {
+      payload.push(v);
+    }
+    console.log(table);
+    console.table(payload);
+    const { error } = await supabase.from(table.toString()).upsert(payload);
+    if (error) console.error(error);
+  }
+};
+
+// 10 * 1000ms => 10sec
+export const cache = new Cache(10 * 1000);
+
+getData();
+
+cache.on('endOfLife', () => {
+  submitData();
+  getData();
+});
 
 client.commands = new Collection();
 
