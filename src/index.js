@@ -22,7 +22,7 @@ export const supabase = createClient(
 
 const getData = () => {
   supabase
-    .from('test')
+    .from('server')
     .select()
     .then((result) => {
       if (result.error) {
@@ -31,22 +31,34 @@ const getData = () => {
       }
 
       Object.keys(result.data).map((key) => {
-        cache.set('test', result.data[key].uuid, result.data[key]);
+        cache.set('server', result.data[key].id, result.data[key]);
+      });
+    });
+
+  supabase
+    .from('user')
+    .select()
+    .then((result) => {
+      if (result.error) {
+        console.error(result.error);
+        return;
+      }
+
+      Object.keys(result.data).map((key) => {
+        cache.set('user', result.data[key].id, result.data[key]);
       });
     });
 };
 
 const submitData = async () => {
-  for (const table in cache.data) {
-    const payload = [];
-    for (const [k, v] of cache.data[table]) {
-      payload.push(v);
-    }
-    console.log(table);
-    console.table(payload);
-    const { error } = await supabase.from(table.toString()).upsert(payload);
-    if (error) console.error(error);
-  }
+  const userPayload = cache.get('user');
+  const userError = await supabase.from('user').upsert(userPayload);
+
+  const serverPayload = cache.get('server');
+  const serverError = await supabase.from('server').upsert(serverPayload);
+
+  if (userError.error) console.error(userError.error);
+  if (serverError.error) console.error(serverError.error);
 };
 
 export const cache = new Cache(general.cache.timeOfLife);
