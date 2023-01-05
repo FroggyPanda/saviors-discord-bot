@@ -35,13 +35,16 @@ export default class Cache extends EventEmitter {
     }
     if (arguments.length === 1) {
       if (this.data[table] === undefined)
-        throw new Error('table does not exist');
+        // throw new Error('table does not exist');
+        return false;
       return [...this.data[table].values()];
     } else if (arguments.length === 2) {
       if (this.data[table] === undefined)
-        throw new Error('table does not exist');
+        // throw new Error('table does not exist');
+        return false;
       if (this.data[table].get(key) === undefined)
-        throw new Error('key does not exist');
+        // throw new Error('key does not exist');
+        return false;
 
       return this.data[table].get(key);
     }
