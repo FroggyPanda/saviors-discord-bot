@@ -27,16 +27,23 @@ export default class Cache extends EventEmitter {
     }
 
     this.data[table].set(key, value);
-    return true;
   }
 
   get(table, key) {
     if (this.isEndOfLife()) {
       this.emit('endOfLife');
     }
-    if (this.data[table] === undefined) return false;
-    if (this.data[table].get(key) === undefined) return false;
+    if (arguments.length === 1) {
+      if (this.data[table] === undefined)
+        throw new Error('table does not exist');
+      return [...this.data[table].values()];
+    } else if (arguments.length === 2) {
+      if (this.data[table] === undefined)
+        throw new Error('table does not exist');
+      if (this.data[table].get(key) === undefined)
+        throw new Error('key does not exist');
 
-    return this.data[table].get(key);
+      return this.data[table].get(key);
+    }
   }
 }
