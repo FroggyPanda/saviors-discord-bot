@@ -106,6 +106,8 @@ cache.on('endOfLife', () => {
   getData();
 });
 
+getData();
+
 const run = async () => {
   await importx(`${__dirname}/{events,commands}/**/*.{ts,js}`);
 
