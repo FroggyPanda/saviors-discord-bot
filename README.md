@@ -19,37 +19,39 @@ All file types listed here must follow this fomatting to be usable by the loadin
 
 ### Command Files
 
-All command files must export a `const command` to have the the command loader work.
-
 ```js
-import { SlashCommandBuilder } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
+import { Discord, Slash } from 'discordx';
 
-export const command = {
-  data: new SlashCommandBuilder()
-    .setName('NAME OF PLUGIN HERE')
-    .setDescription('DESCRIPTION OF PLUGIN HERE'),
-
-  async execute(interaction) {
-    await interaction.reply('REPLY GOES HERE');
-  },
-};
+@Discord()
+export class Ping {
+  @Slash({
+    name: 'Ping',
+    description: 'What do I reply with?',
+  })
+  nameOfCommand(interaction: CommandInteraction) {
+    interaction.reply('Pong');
+  }
+}
 ```
 
 ### Event Files
 
-All event files must export a `const event` to have the the event loader work.
-
 ```js
-import { Events } from 'discord.js';
+import { Message } from 'discord.js';
+import { Discord, On } from 'discordx';
 
-export const event = {
-  name: Events.[EVENT TYPE HERE],
-  execute(client) {
-    console.log('Event Fired');
-  },
-};
+@Discord()
+class MessageCreate {
+  @On({ event: 'messageCreate' })
+  onMessage(message: Message) {
+    console.log(message);
+  }
+}
 ```
 
 ## Third Party Documentation
 
 [![Discord JS](https://img.shields.io/badge/Discord.JS-000?style=for-the-badge&logo=discord&logoColor=white)](https://discord.js.org/)
+[![DiscordX](https://img.shields.io/badge/DiscordX-000?style=for-the-badge&logo=Discord&logoColor=white)](https://github.com/discordx-ts/discordx/)
+[![Typescript](https://img.shields.io/badge/Typescript-000?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
